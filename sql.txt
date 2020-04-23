@@ -1,0 +1,54 @@
+CREATE TABLE loyalty_card_type (
+	Id int NOT NULL PRIMARY KEY,
+	Name text NOT NULL CHECK (char_length(Name) <= 50),
+	SpentThreshold numeric CHECK (SpentThreshold >= 0 AND SpentThreshold <= 9999999999),
+	Duration int,
+	DiscountPercent int CHECK (DiscountPercent >= 0 AND DiscountPercent <= 100),
+	CreatedOn date,
+	ModifiedOn date
+);
+
+INSERT INTO loyalty_card_type (Id, Name, SpentThreshold, Duration, DiscountPercent, CreatedOn, ModifiedOn) VALUES (1, 'the_chuan', 0, 365, 1, '2019-12-18', '2019-12-18');
+INSERT INTO loyalty_card_type (Id, Name, SpentThreshold, Duration, DiscountPercent, CreatedOn, ModifiedOn) VALUES (2, 'the_bac', 5000000, 365, 2, '2019-12-18', '2019-12-18');
+INSERT INTO loyalty_card_type (Id, Name, SpentThreshold, Duration, DiscountPercent, CreatedOn, ModifiedOn) VALUES (3, 'the_vang', 10000000, 365, 5, '2019-12-18', '2019-12-18');
+INSERT INTO loyalty_card_type (Id, Name, SpentThreshold, Duration, DiscountPercent, CreatedOn, ModifiedOn) VALUES (4, 'the_bach_kim', 20000000, 365, 7, '2019-12-18', '2019-12-18');
+INSERT INTO loyalty_card_type (Id, Name, SpentThreshold, Duration, DiscountPercent, CreatedOn, ModifiedOn) VALUES (5, 'the_kim_cuong', 50000000, 365, 10, '2019-12-18', '2019-12-18');
+
+CREATE TABLE loyalty_card (
+	Id int NOT NULL PRIMARY KEY,
+	Code text NOT NULL CHECK (char_length(Code) >= 10 AND char_length(Code) <= 25),
+	Phone text NOT NULL CHECK (char_length(Phone) >= 10 AND char_length(Phone) <= 20),
+	LoyaltyCartTypeid int,
+	Point numeric,
+	TotalSpent numeric,
+	StartDate date,
+	EndDate date,
+	CreatedOn date,
+	ModifiedOn date,
+	UNIQUE(Code),
+	UNIQUE(Phone),
+	CONSTRAINT loyalty_card_type_fkey FOREIGN KEY (LoyaltyCartTypeid) REFERENCES loyalty_card_type (Id) MATCH SIMPLE ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+INSERT INTO loyalty_card (Id, Code, Phone, LoyaltyCartTypeid, Point, TotalSpent, StartDate, EndDate, CreatedOn, ModifiedOn) VALUES (1, 'LT0001', '0987654321', 1, 23.45, 2345000, '2019-12-18', '2020-12-18', '2019-12-18', '2019-12-18');
+INSERT INTO loyalty_card (Id, Code, Phone, LoyaltyCartTypeid, Point, TotalSpent, StartDate, EndDate, CreatedOn, ModifiedOn) VALUES (2, 'LT0002', '0987654322', 2, 0, 7987000, '2019-10-17', '2020-10-17', '2019-05-17', '2019-12-17');
+INSERT INTO loyalty_card (Id, Code, Phone, LoyaltyCartTypeid, Point, TotalSpent, StartDate, EndDate, CreatedOn, ModifiedOn) VALUES (3, 'LT0003', '0987654323', 3, -12, 15400000, '2019-11-12', '2020-11-12', '2019-04-15', '2019-11-27');
+INSERT INTO loyalty_card (Id, Code, Phone, LoyaltyCartTypeid, Point, TotalSpent, StartDate, EndDate, CreatedOn, ModifiedOn) VALUES (4, 'HT0001', '0987654324', 4, 30, 30000000, '2019-05-23', '2020-05-23', '2019-03-12', '2019-08-23');
+INSERT INTO loyalty_card (Id, Code, Phone, LoyaltyCartTypeid, Point, TotalSpent, StartDate, EndDate, CreatedOn, ModifiedOn) VALUES (5, 'HT0002', '0987654325', 5, 39, 54000000, '2019-07-27', '2020-07-27', '2019-02-01', '2019-11-27');
+
+CREATE TABLE transaction (
+	Id int NOT NULL PRIMARY KEY,
+	LoyaltyCardId int,
+	PointAdjust numeric NOT NULL CHECK (PointAdjust >= -9999999999 AND PointAdjust <= 9999999999),
+	SpentAdjust numeric NOT NULL CHECK (SpentAdjust >= -9999999999 AND SpentAdjust <= 9999999999),
+	CreatedOn date,
+	CONSTRAINT transaction_fkey FOREIGN KEY (LoyaltyCardId)
+      REFERENCES loyalty_card (Id) MATCH SIMPLE
+      ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE convert (
+	Id int NOT NULL PRIMARY KEY,
+	Sales bigint,
+	Points bigint
+);
